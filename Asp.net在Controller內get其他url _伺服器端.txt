@@ -1,0 +1,4 @@
+public JsonResult test(string password)
+        {
+            return Json(new { id=14,name="fm"}, JsonRequestBehavior.AllowGet);
+        }
