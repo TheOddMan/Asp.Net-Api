@@ -1,0 +1,51 @@
+[HttpPost]
+        public async System.Threading.Tasks.Task<ActionResult> GetAllClasses()
+        {
+            HttpClient client = new HttpClient();
+            var name = new StringContent("name=swater0", Encoding.UTF8, "application/json");
+            apiInfo data = new apiInfo() { sysToken = "A056315739" };
+            var myContent = JsonConvert.SerializeObject(data);
+            var buffer = System.Text.Encoding.UTF8.GetBytes(myContent);
+            var byteContent = new ByteArrayContent(buffer);
+            byteContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+
+            var info = new FormUrlEncodedContent(new[]
+            {
+                    new KeyValuePair<string, string>("sysToken", "A056315739")
+                });
+
+             var response = await client.PostAsync("http://140.130.33.228/api/System2SystemApi/allClass", byteContent);
+
+            response.EnsureSuccessStatusCode();
+            string responseBody = await response.Content.ReadAsStringAsync();
+            string res = RemoveEncoding(responseBody);
+            JavaScriptSerializer json_serializer = new JavaScriptSerializer();
+            List<ClassApi> clas = new List<ClassApi>();
+
+
+            List<ClassApi> all = JsonConvert.DeserializeObject<List<ClassApi>>(res);
+
+            all.ToList().ForEach(x =>
+            {
+                Class c = new Class() {
+                    name = x.Name,
+                    institution = x.Institution,
+                    organize = x.Organize,
+                    createTime = x.Time
+                };
+
+                db.Class.Add(c);
+            });
+
+ 
+            return Json("¶×¤J§¹¦¨");
+        }
+
+private string RemoveEncoding(string encodedJson)
+        {
+            var sb = new StringBuilder(encodedJson);
+            sb.Replace("\\", string.Empty);
+            sb.Replace("\"[", "[");
+            sb.Replace("]\"", "]");
+            return sb.ToString();
+        }
